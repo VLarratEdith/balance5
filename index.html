@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Clasifica el Balance - EBAU 2º Bachillerato</title>
+    <style>
+        /* ========== VARIABLES DE COLOR ========== */
+        :root {
+            --color-activo: #4CAF50;
+            --color-pasivo: #F44336;
+            --color-patrimonio: #2196F3;
+            --color-no-corriente: #9C27B0;
+            --color-corriente: #FF9800;
+            --color-fondo: #1a1a2e;
+            --color-secundario: #16213e;
+            --color-terciario: #0f3460;
+            --color-texto: #e6e6e6;
+            --color-acierto: #4CAF50;
+            --color-error: #F44336;
+            --color-info: #2196F3;
+            --color-warning: #FFC107;
+        }
+
+        /* ========== ESTILOS GENERALES ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--color-fondo) 0%, var(--color-secundario) 100%);
+            color: var(--color-texto);
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        /* ========== CONTENEDOR PRINCIPAL ========== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ========== CABECERA ========== */
+        header {
+            text-align: center;
+            padding: 15px;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin-bottom: 8px;
+            background: linear-gradient(45deg, var(--color-activo), var(--color-patrimonio), var(--color-pasivo));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .subtitle-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .subtitle {
+            font-size: 1em;
+            color: var(--color-warning);
+        }
+
+        /* ========== BOTÓN DE MÚSICA ========== */
+        .music-control {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--color-info), #0D47A1);
+            color: white;
+            font-size: 1.2em;
+            cursor: pointer;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .music-control:hover {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.6);
+        }
+
+        .music-control.active {
+            background: linear-gradient(135deg, var(--color-acierto), #2E7D32);
+            animation: pulseMusic 2s infinite;
+        }
+
+        @keyframes pulseMusic {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
+            50% { box-shadow: 0 0 0 8px rgba(76, 175, 80, 0); }
+        }
+
+        /* ========== PANEL DE INFORMACIÓN ========== */
+        .info-panel {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .info-box {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 15px 10px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid;
+            transition: all 0.3s ease;
+            min-height: 100px;
+        }
+
+        .info-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .info-box.score {
+            border-color: var(--color-warning);
+        }
+
+        .info-box.timer {
+            border-color: var(--color-error);
+        }
+
+        .info-box.level {
+            border-color: var(--color-info);
+        }
+
+        .info-box h3 {
+            font-size: 0.9em;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .info-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            display: block;
+        }
+
+        .score-value { color: var(--color-warning); }
+        .timer-value { color: var(--color-error); }
+        .level-value { color: var(--color-info); }
+
+        /* ========== SECCIÓN DE JUEGO ========== */
+        .game-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .element-card {
+            background: linear-gradient(135deg, var(--color-secundario), var(--color-terciario));
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 15px;
+            border: 2px solid var(--color-warning);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7); }
+            50% { box-shadow: 0 0 0 8px rgba(255, 193, 7, 0); }
+        }
+
+        .element-name {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--color-warning);
+        }
+
+        .element-description {
+            font-size: 0.95em;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        /* ========== PREGUNTAS DE ORIENTACIÓN ========== */
+        .questions-section {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 25px;
+            border-top: 3px solid var(--color-warning);
+        }
+
+        .question-title {
+            font-size: 1.1em;
+            margin-bottom: 12px;
+            color: var(--color-info);
+            text-align: center;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .question {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border-left: 3px solid var(--color-warning);
+        }
+
+        .question-text {
+            font-size: 0.95em;
+            margin-bottom: 8px;
+        }
+
+        /* ========== BOTONES DE RESPUESTA ========== */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+            margin-bottom: 25px;
+        }
+
+        .option-btn {
+            padding: 12px 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .option-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .option-btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn-activo { 
+            background: linear-gradient(135deg, var(--color-activo), #2E7D32); 
+            color: white;
+        }
+
+        .btn-pasivo { 
+            background: linear-gradient(135deg, var(--color-pasivo), #C62828); 
+            color: white;
+        }
+
+        .btn-patrimonio { 
+            background: linear-gradient(135deg, var(--color-patrimonio), #0D47A1); 
+            color: white;
+        }
+
+        .btn-no-corriente { 
+            background: linear-gradient(135deg, var(--color-no-corriente), #4A148C); 
+            color: white;
+        }
+
+        .btn-corriente { 
+            background: linear-gradient(135deg, var(--color-corriente), #E65100); 
+            color: white;
+        }
+
+        .btn-submasa {
+            background: linear-gradient(135deg, #673AB7, #311B92);
+            color: white;
+        }
+
+        /* ========== FEEDBACK ========== */
+        .feedback {
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 15px;
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: bold;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .feedback.correct {
+            background: rgba(76, 175, 80, 0.2);
+            border: 2px solid var(--color-acierto);
+            color: var(--color-acierto);
+            display: block;
+        }
+
+        .feedback.incorrect {
+            background: rgba(244, 67, 54, 0.2);
+            border: 2px solid var(--color-error);
+            color: var(--color-error);
+            display: block;
+        }
+
+        .feedback-description {
+            font-size: 0.9em;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        /* ========== BOTONES DE CONTROL ========== */
+        .control-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .control-btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, var(--color-acierto), #2E7D32);
+            color: white;
+        }
+
+        .btn-retry {
+            background: linear-gradient(135deg, var(--color-warning), #FF8F00);
+            color: #333;
+        }
+
+        .btn-menu {
+            background: linear-gradient(135deg, var(--color-info), #0D47A1);
+            color: white;
+        }
+
+        /* ========== MODAL DE RESULTADOS ========== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, var(--color-secundario), var(--color-terciario));
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 550px;
+            width: 95%;
+            text-align: center;
+            border: 3px solid var(--color-warning);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+            animation: modalSlide 0.5s ease;
+        }
+
+        @keyframes modalSlide {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal h2 {
+            font-size: 2em;
+            margin-bottom: 15px;
+            color: var(--color-warning);
+        }
+
+        .modal-stats {
+            font-size: 1.1em;
+            margin: 15px 0;
+            line-height: 1.8;
+        }
+
+        .modal-btns {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        /* ========== NIVELES ========== */
+        .level-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .level-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid var(--color-info);
+        }
+
+        .level-btn:hover {
+            background: rgba(33, 150, 243, 0.3);
+            transform: scale(1.03);
+        }
+
+        .level-btn.active {
+            background: rgba(33, 150, 243, 0.6);
+            border-color: var(--color-warning);
+        }
+
+        /* ========== PROGRESS BAR ========== */
+        .progress-container {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow: hidden;
+            height: 15px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-activo), var(--color-patrimonio), var(--color-pasivo));
+            transition: width 0.5s ease;
+            border-radius: 8px;
+        }
+
+        /* ========== ANIMACIONES ========== */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .bounce {
+            animation: bounce 1s ease;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.6em;
+            }
+
+            .subtitle {
+                font-size: 0.9em;
+            }
+
+            .music-control {
+                width: 35px;
+                height: 35px;
+                font-size: 1em;
+            }
+
+            .info-panel {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .info-box {
+                padding: 12px 8px;
+                min-height: 85px;
+            }
+
+            .info-box h3 {
+                font-size: 0.85em;
+            }
+
+            .info-value {
+                font-size: 1.3em;
+            }
+
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .control-buttons {
+                flex-direction: column;
+            }
+
+            .control-btn {
+                width: 100%;
+                padding: 12px;
+            }
+
+            .modal-content {
+                padding: 25px;
+            }
+
+            .modal h2 {
+                font-size: 1.7em;
+            }
+
+            .level-selector {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            header {
+                padding: 12px;
+            }
+
+            h1 {
+                font-size: 1.4em;
+            }
+
+            .subtitle-container {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .subtitle {
+                font-size: 0.85em;
+            }
+
+            .music-control {
+                width: 32px;
+                height: 32px;
+                font-size: 0.9em;
+            }
+
+            .game-section {
+                padding: 15px;
+            }
+
+            .element-name {
+                font-size: 1.3em;
+            }
+
+            .element-description {
+                font-size: 0.9em;
+            }
+
+            .info-value {
+                font-size: 1.2em;
+            }
+
+            .info-box h3 {
+                font-size: 0.8em;
+            }
+
+            .level-selector {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-btns {
+                flex-direction: column;
+            }
+
+            .modal-btns .control-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- AUDIO PLAYER (OCULTO) -->
+    <audio id="bgMusic" src="1_Balance.mp3.mpeg" loop></audio>
+
+    <div class="container">
+        <!-- ========== CABECERA ========== -->
+        <header>
+            <h1>🎮 Clasifica el Balance</h1>
+            <div class="subtitle-container">
+                <p class="subtitle">Aprende las masas y submasas patrimoniales del balance EBAU</p>
+                <button class="music-control" id="musicBtn" onclick="toggleMusic()">🎵</button>
+            </div>
+        </header>
+
+        <!-- ========== SELECCIÓN DE NIVEL ========== -->
+        <div class="game-section" id="levelSelection">
+            <h2 style="font-size: 1.4em; text-align: center; margin-bottom: 15px; color: var(--color-warning);">🎯 Selecciona tu nivel de dificultad</h2>
+            <div class="level-selector">
+                <button class="level-btn active" data-level="1">Nivel 1<br><small>Principiante</small></button>
+                <button class="level-btn" data-level="2">Nivel 2<br><small>Intermedio</small></button>
+                <button class="level-btn" data-level="3">Nivel 3<br><small>Experto</small></button>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="control-btn btn-next" onclick="startGame()">🎮 ¡Comenzar!</button>
+            </div>
+        </div>
+
+        <!-- ========== PANEL DE INFORMACIÓN ========== -->
+        <div class="info-panel">
+            <div class="info-box score">
+                <h3>Puntuación</h3>
+                <span class="info-value score-value" id="score">0</span>
+            </div>
+            <div class="info-box timer">
+                <h3>⏰ Tiempo</h3>
+                <span class="info-value timer-value" id="timer">60</span>
+            </div>
+            <div class="info-box level">
+                <h3>📊 Nivel</h3>
+                <span class="info-value level-value" id="level">1</span>
+            </div>
+        </div>
+
+        <!-- ========== JUEGO ========== -->
+        <div class="game-section" id="gameSection" style="display: none;">
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+            </div>
+
+            <!-- ELEMENTO A CLASIFICAR -->
+            <div class="element-card">
+                <div class="element-name" id="elementName">Cargando...</div>
+                <div class="element-description" id="elementDescription">...</div>
+            </div>
+
+            <!-- OPCIONES DE RESPUESTA -->
+            <div class="options-grid" id="optionsGrid">
+                <!-- Las opciones se generarán dinámicamente -->
+            </div>
+
+            <!-- FEEDBACK -->
+            <div class="feedback" id="feedback">
+                <div id="feedbackText">¡Correcto!</div>
+                <div class="feedback-description" id="feedbackDescription"></div>
+            </div>
+
+            <!-- BOTONES DE CONTROL -->
+            <div class="control-buttons">
+                <button class="control-btn btn-next" id="nextBtn" onclick="nextQuestion()" style="display: none;">⏭️ Siguiente</button>
+                <button class="control-btn btn-retry" id="retryBtn" onclick="retryQuestion()" style="display: none;">🔄 Reintentar</button>
+            </div>
+
+            <!-- PREGUNTAS DE ORIENTACIÓN (AL FINAL) -->
+            <div class="questions-section">
+                <div class="question-title">💡 Preguntas de orientación</div>
+                <div class="question">
+                    <div class="question-text" id="question1">¿Es algo que tengo o me deben?</div>
+                </div>
+                <div class="question">
+                    <div class="question-text" id="question2">¿Se espera recuperarlo en menos de un año?</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL DE RESULTADOS ========== -->
+    <div class="modal" id="resultsModal">
+        <div class="modal-content">
+            <h2>🎉 ¡Juego completado!</h2>
+            <div class="modal-stats">
+                <p>Puntuación final: <strong id="finalScore">0</strong> puntos</p>
+                <p>Tiempo restante: <strong id="finalTime">0</strong> segundos</p>
+                <p>Nivel completado: <strong id="finalLevel">1</strong></p>
+            </div>
+            <div class="modal-btns">
+                <button class="control-btn btn-menu" onclick="restartGame()">🏠 Menú principal</button>
+                <button class="control-btn btn-next" onclick="nextLevel()">⬆️ Subir nivel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== VARIABLES DE MÚSICA ==========
+        const bgMusic = document.getElementById('bgMusic');
+        const musicBtn = document.getElementById('musicBtn');
+        let isMusicPlaying = false;
+
+        // ========== CONTROL DE MÚSICA ==========
+        function toggleMusic() {
+            if (bgMusic.paused) {
+                bgMusic.play().then(() => {
+                    isMusicPlaying = true;
+                    musicBtn.classList.add('active');
+                    musicBtn.innerHTML = '🔊';
+                }).catch(error => {
+                    console.log('Reproducción automática bloqueada:', error);
+                    alert('⚠️ Para activar la música, haz clic en cualquier parte de la página primero.');
+                });
+            } else {
+                bgMusic.pause();
+                isMusicPlaying = false;
+                musicBtn.classList.remove('active');
+                musicBtn.innerHTML = '🔇';
+            }
+        }
+
+        // ========== DATOS DEL JUEGO ==========
+        const balanceData = {
+            // NIVEL 1: MASAS PRINCIPALES
+            level1: [
+                {
+                    element: "Efectivo en caja",
+                    description: "Dinero en metálico que tiene la empresa disponible",
+                    question1: "¿Es algo que tengo o me deben?",
+                    question2: "¿Se espera recuperarlo en menos de un año?",
+                    correctAnswer: "Activo",
+                    feedback: "¡Correcto! El efectivo es un ACTIVO porque es algo que la empresa tiene y le pertenece."
+                },
+                {
+                    element: "Maquinaria",
+                    description: "Equipos e instalaciones utilizados en la producción",
+                    question1: "¿Es algo que tengo o me deben?",
+                    question2: "¿Se espera recuperarlo en menos de un año?",
+                    correctAnswer: "Activo",
+                    feedback: "¡Correcto! La maquinaria es un ACTIVO porque es un bien que posee la empresa para su actividad."
+                },
+                {
+                    element: "Capital Social",
+                    description: "Aportaciones de los socios o accionistas",
+                    question1: "¿Es algo que tengo o me deben?",
+                    question2: "¿Representa una deuda de la empresa?",
+                    correctAnswer: "Patrimonio Neto",
+                    feedback: "¡Correcto! El capital social es PATRIMONIO NETO porque representa los recursos propios aportados por los dueños."
+                },
+                {
+                    element: "Préstamo bancario a 5 años",
+                    description: "Dinero prestado al banco con devolución en 5 años",
+                    question1: "¿Es algo que tengo o me deben?",
+                    question2: "¿Representa una deuda de la empresa?",
+                    correctAnswer: "Pasivo",
+                    feedback: "¡Correcto! El préstamo es un PASIVO porque es una deuda que la empresa debe pagar."
+                },
+                {
+                    element: "Clientes",
+                    description: "Personas o empresas que nos deben dinero por ventas",
+                    question1: "¿Es algo que tengo o me deben?",
+                    question2: "¿Se espera cobrarlo en menos de un año?",
+                    correctAnswer: "Activo",
+                    feedback: "¡Correcto! Los clientes son un ACTIVO porque representan derechos de cobro de la empresa."
+                },
+                {
+                    element: "Proveedores",
+                    description: "Empresas a las que debemos dinero por compras",
+                    question1: "¿Es algo que tengo o me deben?",
+                    question2: "¿Representa una deuda de la empresa?",
+                    correctAnswer: "Pasivo",
+                    feedback: "¡Correcto! Los proveedores son un PASIVO porque son deudas que la empresa debe pagar."
+                },
+                {
+                    element: "Terrenos",
+                    description: "Terrenos propiedad de la empresa",
+                    question1: "¿Es algo que tengo o me deben?",
+                    question2: "¿Se espera recuperarlo en menos de un año?",
+                    correctAnswer: "Activo",
+                    feedback: "¡Correcto! Los terrenos son un ACTIVO porque son bienes que posee la empresa."
+                },
+                {
+                    element: "Reservas",
+                    description: "Beneficios acumulados no distribuidos",
+                    question1: "¿Es algo que tengo o me deben?",
+                    question2: "¿Representa una deuda de la empresa?",
+                    correctAnswer: "Patrimonio Neto",
+                    feedback: "¡Correcto! Las reservas son PATRIMONIO NETO porque son beneficios acumulados de la empresa."
+                }
+            ],
+            
+            // NIVEL 2: NO CORRIENTE vs CORRIENTE
+            level2: [
+                {
+                    element: "Construcciones",
+                    description: "Edificios y naves industriales propiedad de la empresa",
+                    question1: "¿Es algo que tengo o me deben?",
+                    question2: "¿Se espera recuperarlo en menos de un año?",
+                    correctAnswer: "Activo No Corriente",
+                    feedback: "¡Correcto! Las construcciones son ACTIVO NO CORRIENTE porque son bienes duraderos que se utilizan más de un año."
+                },
+                {
+                    element: "Existencias de productos terminados",
+                    description: "Productos fabricados listos para vender",
+                    question1: "¿Es algo que tengo o me deben?",
+                    question2: "¿Se espera recuperarlo en menos de un año?",
+                    correctAnswer: "Activo Corriente",
+                    feedback: "¡Correcto! Las existencias son ACTIVO CORRIENTE porque se espera venderlas en menos de un año."
+                },
+                {
+                    element: "Deudas a largo plazo con bancos",
+                    description: "Préstamos bancarios con vencimiento superior a un año",
+                    question1: "¿Es algo que tengo o me deben?",
+                    question2: "¿Se debe pagar en más de un año?",
+                    correctAnswer: "Pasivo No Corriente",
+                    feedback: "¡Correcto! Las deudas a L/P son PASIVO NO CORRIENTE porque se pagarán en más de un año."
+                },
+                {
+                    element: "Deudas a corto plazo con bancos",
+                    description: "Préstamos bancarios con vencimiento inferior a un año",
+                    question1: "¿Es algo que tengo o me deben?",
+                    question2: "¿Se debe pagar en menos de un año?",
+                    correctAnswer: "Pasivo Corriente",
+                    feedback: "¡Correcto! Las deudas a C/P son PASIVO CORRIENTE porque se pagarán en menos de un año."
+                },
+                {
+                    element: "Aplicaciones informáticas",
+                    description: "Software y programas propiedad de la empresa",
+                    question1: "¿Es algo que tengo o me deben?",
+                    question2: "¿Se espera recuperarlo en menos de un año?",
+                    correctAnswer: "Activo No Corriente",
+                    feedback: "¡Correcto! Las aplicaciones informáticas son ACTIVO NO CORRIENTE porque son bienes intangibles duraderos."
+                },
+                {
+                    element: "Bancos",
+                    description: "Dinero depositado en cuentas corrientes",
+                    question1: "¿Es algo que tengo o me deben?",
+                    question2: "¿Se espera recuperarlo en menos de un año?",
+                    correctAnswer: "Activo Corriente",
+                    feedback: "¡Correcto! El dinero en bancos es ACTIVO CORRIENTE porque está disponible para usar en cualquier momento."
+                }
+            ],
+            
+            // NIVEL 3: SUBMASAS COMPLETAS
+            level3: [
+                {
+                    element: "Propiedad industrial",
+                    description: "Patentes, marcas y derechos de autor",
+                    question1: "¿Es algo que tengo o me deben?",
+                    question2: "¿Es un bien tangible o intangible?",
+                    correctAnswer: "Inmovilizado Intangible",
+                    feedback: "¡Correcto! La propiedad industrial es INMOVILIZADO INTANGIBLE porque son derechos sin forma física pero con valor económico."
+                },
+                {
+                    element: "Materias primas",
+                    description: "Materiales que se transformarán en productos",
+                    question1: "¿Es algo que tengo o me deben?",
+                    question2: "¿Se transformará en producto terminado?",
+                    correctAnswer: "Existencias",
+                    feedback: "¡Correcto! Las materias primas son EXISTENCIAS porque son bienes que se transformarán en productos terminados."
+                },
+                {
+                    element: "Clientes",
+                    description: "Personas que nos deben dinero por ventas a crédito",
+                    question1: "¿Es algo que tengo o me deben?",
+                    question2: "¿Se espera cobrarlo en menos de un año?",
+                    correctAnswer: "Realizable",
+                    feedback: "¡Correcto! Los clientes son REALIZABLE porque son derechos de cobro que se esperan recuperar en menos de un año."
+                },
+                {
+                    element: "Caja",
+                    description: "Dinero en metálico disponible",
+                    question1: "¿Es algo que tengo o me deben?",
+                    question2: "¿Está inmediatamente disponible?",
+                    correctAnswer: "Disponible",
+                    feedback: "¡Correcto! La caja es DISPONIBLE porque es dinero en efectivo que está inmediatamente disponible para la empresa."
+                },
+                {
+                    element: "Reserva legal",
+                    description: "Parte de beneficios obligatoria para fortalecer patrimonio",
+                    question1: "¿Es algo que tengo o me deben?",
+                    question2: "¿Es una aportación de socios o beneficio acumulado?",
+                    correctAnswer: "Reservas",
+                    feedback: "¡Correcto! La reserva legal es una RESERVA porque es una parte obligatoria de los beneficios acumulados."
+                },
+                {
+                    element: "Proveedores",
+                    description: "Empresas a las que debemos por compras a crédito",
+                    question1: "¿Es algo que tengo o me deben?",
+                    question2: "¿Se debe pagar en menos de un año?",
+                    correctAnswer: "Pasivo Corriente",
+                    feedback: "¡Correcto! Los proveedores son PASIVO CORRIENTE porque son deudas comerciales que se pagan en menos de un año."
+                },
+                {
+                    element: "Instalaciones técnicas",
+                    description: "Sistemas y equipos instalados en la empresa",
+                    question1: "¿Es algo que tengo o me deben?",
+                    question2: "¿Tiene forma física y duración superior a un año?",
+                    correctAnswer: "Inmovilizado Material",
+                    feedback: "¡Correcto! Las instalaciones técnicas son INMOVILIZADO MATERIAL porque son bienes tangibles de larga duración."
+                },
+                {
+                    element: "Inversiones financieras a largo plazo",
+                    description: "Participaciones en otras empresas con intención de mantener",
+                    question1: "¿Es algo que tengo o me deben?",
+                    question2: "¿Se mantendrá más de un año?",
+                    correctAnswer: "Inversiones Financieras L/P",
+                    feedback: "¡Correcto! Las inversiones financieras a L/P son para mantener participaciones en otras empresas durante largo tiempo."
+                }
+            ]
+        };
+
+        // ========== VARIABLES DEL JUEGO ==========
+        let currentLevel = 1;
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let timeLeft = 60;
+        let timerInterval;
+        let gameActive = false;
+
+        // ========== FUNCIONES DEL JUEGO ==========
+        
+        // Seleccionar nivel
+        document.querySelectorAll('.level-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentLevel = parseInt(this.dataset.level);
+                document.getElementById('level').textContent = currentLevel;
+            });
+        });
+
+        // Iniciar juego
+        function startGame() {
+            gameActive = true;
+            currentQuestionIndex = 0;
+            score = 0;
+            timeLeft = 60;
+            
+            document.getElementById('levelSelection').style.display = 'none';
+            document.getElementById('gameSection').style.display = 'block';
+            document.getElementById('score').textContent = score;
+            
+            // Iniciar temporizador
+            clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+            
+            loadQuestion();
+        }
+
+        // Cargar pregunta
+        function loadQuestion() {
+            const questions = balanceData[`level${currentLevel}`];
+            
+            if (currentQuestionIndex >= questions.length) {
+                endGame();
+                return;
+            }
+            
+            const question = questions[currentQuestionIndex];
+            
+            // Actualizar progreso
+            const progress = ((currentQuestionIndex) / questions.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            
+            // Mostrar elemento
+            document.getElementById('elementName').textContent = question.element;
+            document.getElementById('elementDescription').textContent = question.description;
+            
+            // Mostrar preguntas de orientación
+            document.getElementById('question1').textContent = question.question1;
+            document.getElementById('question2').textContent = question.question2;
+            
+            // Generar opciones
+            generateOptions(question.correctAnswer);
+            
+            // Limpiar feedback
+            document.getElementById('feedback').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('retryBtn').style.display = 'none';
+        }
+
+        // Generar opciones según el nivel
+        function generateOptions(correctAnswer) {
+            const optionsGrid = document.getElementById('optionsGrid');
+            optionsGrid.innerHTML = '';
+            
+            let options = [];
+            
+            if (currentLevel === 1) {
+                options = ["Activo", "Pasivo", "Patrimonio Neto"];
+            } else if (currentLevel === 2) {
+                options = ["Activo No Corriente", "Activo Corriente", "Pasivo No Corriente", "Pasivo Corriente"];
+            } else {
+                options = [
+                    "Inmovilizado Intangible",
+                    "Inmovilizado Material", 
+                    "Existencias",
+                    "Realizable",
+                    "Disponible",
+                    "Reservas",
+                    "Inversiones Financieras L/P"
+                ];
+            }
+            
+            // Mezclar opciones
+            options = shuffleArray(options);
+            
+            options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                
+                if (currentLevel === 1) {
+                    if (option === "Activo") btn.classList.add('btn-activo');
+                    else if (option === "Pasivo") btn.classList.add('btn-pasivo');
+                    else if (option === "Patrimonio Neto") btn.classList.add('btn-patrimonio');
+                } else if (currentLevel === 2) {
+                    if (option.includes("No Corriente")) btn.classList.add('btn-no-corriente');
+                    else if (option.includes("Corriente")) btn.classList.add('btn-corriente');
+                } else {
+                    btn.classList.add('btn-submasa');
+                }
+                
+                btn.onclick = () => checkAnswer(option, correctAnswer);
+                optionsGrid.appendChild(btn);
+            });
+        }
+
+        // Verificar respuesta
+        function checkAnswer(selected, correct) {
+            const feedback = document.getElementById('feedback');
+            const feedbackText = document.getElementById('feedbackText');
+            const feedbackDescription = document.getElementById('feedbackDescription');
+            
+            if (selected === correct) {
+                // Respuesta correcta
+                feedback.className = 'feedback correct';
+                feedbackText.textContent = '✅ ¡Correcto!';
+                feedbackDescription.textContent = balanceData[`level${currentLevel}`][currentQuestionIndex].feedback;
+                
+                score += 10;
+                document.getElementById('score').textContent = score;
+                
+                document.getElementById('nextBtn').style.display = 'block';
+            } else {
+                // Respuesta incorrecta
+                feedback.className = 'feedback incorrect';
+                feedbackText.textContent = '❌ Incorrecto';
+                feedbackDescription.textContent = `La respuesta correcta es: ${correct}`;
+                
+                timeLeft -= 5;
+                if (timeLeft < 0) timeLeft = 0;
+                
+                document.getElementById('retryBtn').style.display = 'block';
+            }
+            
+            // Deshabilitar botones
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.disabled = true;
+                if (btn.textContent === correct) {
+                    btn.style.backgroundColor = 'rgba(76, 175, 80, 0.5)';
+                }
+                if (btn.textContent === selected && selected !== correct) {
+                    btn.style.backgroundColor = 'rgba(244, 67, 54, 0.5)';
+                }
+            });
+        }
+
+        // Siguiente pregunta
+        function nextQuestion() {
+            currentQuestionIndex++;
+            loadQuestion();
+        }
+
+        // Reintentar pregunta
+        function retryQuestion() {
+            loadQuestion();
+        }
+
+        // Actualizar temporizador
+        function updateTimer() {
+            timeLeft--;
+            document.getElementById('timer').textContent = timeLeft;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                endGame();
+            }
+        }
+
+        // Terminar juego
+        function endGame() {
+            clearInterval(timerInterval);
+            gameActive = false;
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('finalTime').textContent = timeLeft;
+            document.getElementById('finalLevel').textContent = currentLevel;
+            
+            document.getElementById('resultsModal').style.display = 'flex';
+        }
+
+        // Reiniciar juego
+        function restartGame() {
+            document.getElementById('resultsModal').style.display = 'none';
+            document.getElementById('gameSection').style.display = 'none';
+            document.getElementById('levelSelection').style.display = 'block';
+        }
+
+        // Subir nivel
+        function nextLevel() {
+            document.getElementById('resultsModal').style.display = 'none';
+            
+            if (currentLevel < 3) {
+                currentLevel++;
+                document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+                document.querySelector(`.level-btn[data-level="${currentLevel}"]`).classList.add('active');
+                document.getElementById('level').textContent = currentLevel;
+            }
+            
+            startGame();
+        }
+
+        // Función para mezclar array (Fisher-Yates)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // ========== INICIAR MÚSICA AL INTERACTUAR ==========
+        document.addEventListener('click', function() {
+            if (!isMusicPlaying && bgMusic.paused) {
+                bgMusic.play().then(() => {
+                    isMusicPlaying = true;
+                    musicBtn.classList.add('active');
+                    musicBtn.innerHTML = '🔊';
+                }).catch(error => {
+                    // Silenciosamente manejar el error
+                });
+            }
+        }, { once: true });
+    </script>
+</body>
+</html>
